@@ -20,6 +20,6 @@ class EventManager(object):
 
     def unsubscribe(self, func):
         """Attempt to unsubscribe a function. No errors if not found."""
-        for subList in subs:
+        for subList in self.subs:
             if func in subList:
                 subList.remove(func)

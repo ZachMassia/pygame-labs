@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import sys
 import pygame
-from time import clock
 from .event import EventManager
+
 
 class App(object):
     """Responsible for setting up the window and handling events."""
@@ -27,7 +27,7 @@ class App(object):
 
     def register_events(self):
         """Register a few base event handlers."""
-        self.evt_mgr.subscribe(pygame.QUIT,    self.shutdown)
+        self.evt_mgr.subscribe(pygame.QUIT, self.shutdown)
         self.evt_mgr.subscribe(pygame.KEYDOWN, self.on_keydown)
 
     def run(self):
@@ -35,7 +35,8 @@ class App(object):
         self.running = True
 
         while self.running:
-            self.clock.tick(60) # Limit to 60FPS
+            self.clock.tick(60)  # Limit to 60FPS
+
             self.evt_mgr.dispatch(pygame.event.get())
 
             self.game.update(self.clock.get_time())
@@ -58,6 +59,7 @@ class App(object):
 
 
 if __name__ == '__main__':
+    """If this file is ran, a basic black window is shown as a test."""
     app = App({
         'SCR_SIZE'  : (640, 480),
         'SCR_CAP'   : 'Pygame and Python 3 Test',
