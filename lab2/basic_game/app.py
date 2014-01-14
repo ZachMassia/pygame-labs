@@ -22,7 +22,7 @@ class App(object):
 
         self.clock = pygame.time.Clock()
 
-        self.game.SCR_SURF = pygame.display.get_surface()
+        self.game.scr_surf = pygame.display.get_surface()
         self.game.build()
 
     def register_events(self):

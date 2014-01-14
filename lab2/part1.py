@@ -7,7 +7,7 @@ class Game(object):
 
     def __init__(self):
         self.evt_mgr = None   # Injected by App
-        self.SCR_SURF = None  # Injected by App
+        self.scr_surf = None  # Injected by App
 
         self.input_vec = pygame.math.Vector2()
         self.key_mario_pos = pygame.math.Vector2()
@@ -23,10 +23,10 @@ class Game(object):
     def draw(self):
         """Blit surfaces to the display surface."""
         # Keyboard Mario
-        self.SCR_SURF.blit(self.mario_img, (self.key_mario_pos.x,
+        self.scr_surf.blit(self.mario_img, (self.key_mario_pos.x,
                                             self.key_mario_pos.y))
         # Mouse Mario
-        self.SCR_SURF.blit(self.mario_img, self.mouse_mario_pos)
+        self.scr_surf.blit(self.mario_img, self.mouse_mario_pos)
 
     def build(self):
         """Called before the game loop starts."""
