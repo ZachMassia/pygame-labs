@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import pygame
-from .basic_game.app import App
+from basic_game.app import App
 
 
 class Game(object):
@@ -8,6 +8,9 @@ class Game(object):
     def __init__(self):
         self.evt_mgr = None   # Injected by App
         self.scr_surf = None  # Injected by App
+
+        self.sounds = list()
+        self.mario_img = None
 
         self.input_vec = pygame.math.Vector2()
         self.key_mario_pos = pygame.math.Vector2()
@@ -18,7 +21,8 @@ class Game(object):
         self.key_mario_pos += self.input_vec * dt
         self.mouse_mario_pos = pygame.mouse.get_pos()
 
-        self.input_vec = pygame.math.Vector2()  # reset input vec.
+        # Reset input vec.
+        self.input_vec = pygame.math.Vector2()
 
     def draw(self):
         """Blit surfaces to the display surface."""
@@ -32,6 +36,7 @@ class Game(object):
         """Called before the game loop starts."""
         self.setup_event_handlers()
         self.load_mario_img()
+        self.load_sounds()
 
         # Use key repeat
         pygame.key.set_repeat(25, 25)
@@ -54,40 +59,57 @@ class Game(object):
         else:
             self.input_vec.y = 0
 
-        if not self.input_vec.is_normalized():
-            self.input_vec.normalize()
+        if self.input_vec.length() > 0 and not self.input_vec.is_normalized():
+            self.input_vec.normalize_ip()
 
     def play_key_sounds(self, evt):
         """Play sounds for number keys 1-4."""
-        num = None
-
-        if evt.key == pygame.K_1:
-            num = 1
-        elif evt.key == pygame.K_2:
-            num = 2
-        elif evt.key == pygame.K_3:
-            num = 3
-        elif evt.key == pygame.K_4:
-            num = 4
-        #TODO Actually play the sound
+        try:
+            if evt.key == pygame.K_1:
+                self.sounds[0].play()
+            elif evt.key == pygame.K_2:
+                self.sounds[1].play()
+            elif evt.key == pygame.K_3:
+                self.sounds[2].play()
+            elif evt.key == pygame.K_4:
+                self.sounds[3].play()
+        except IndexError:
+            print('Error: sound not loaded.')
+        except pygame.error:
+            print('Error: could not play sound.')
 
     def load_mario_img(self):
         """Load mario and scale him."""
         self.mario_img = pygame.image.load("mario.png")
         self.mario_img = pygame.transform.scale(self.mario_img, (64, 64))
 
-        # Use (0,0) as colorkey
+        # Use (0,0) as color key
         self.mario_img.set_colorkey(self.mario_img.get_at((0, 0)))
 
+    def load_sounds(self):
+        """Load all required sound effects."""
+        for i in range(0, 4):
+            try:
+                sound = pygame.mixer.Sound(file='sound{}.ogg'.format(i))
+                self.sounds.append(sound)
+            except pygame.error:
+                # TODO: Should this cause the game to shutdown?
+                continue
+
     def setup_event_handlers(self):
+        """Register methods with specific Pygame events."""
         self.evt_mgr.subscribe(pygame.KEYDOWN, self.move_key_mario)
         self.evt_mgr.subscribe(pygame.KEYDOWN, self.play_key_sounds)
 
 
 if __name__ == '__main__':
-    app = App({
+    # Create the configuration dict.
+    cfg = {
         'SCR_SIZE': (640, 480),
         'SCR_CAP': 'Pygame and Python 3 Test',
         'SCR_FLAGS': pygame.HWSURFACE | pygame.DOUBLEBUF
-    }, Game())
+    }
+
+    # Initialize the app and run it.
+    app = App(cfg, Game())
     app.run()

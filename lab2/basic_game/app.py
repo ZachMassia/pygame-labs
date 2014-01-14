@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import sys
 import pygame
 from .event import EventManager
@@ -31,7 +30,7 @@ class App(object):
         self.evt_mgr.subscribe(pygame.KEYDOWN, self.on_keydown)
 
     def run(self):
-        """Kicks off the game loop"""
+        """Kicks off the game loop."""
         self.running = True
 
         while self.running:
@@ -41,7 +40,7 @@ class App(object):
 
             self.game.update(self.clock.get_time())
 
-            self.game.SCR_SURF.fill((0, 0, 0))
+            self.game.scr_surf.fill((0, 0, 0))
             self.game.draw()
             pygame.display.update()
 
@@ -56,13 +55,3 @@ class App(object):
         """Handle basic keydown events."""
         if evt.key == pygame.K_ESCAPE:
             self.shutdown(evt)
-
-
-if __name__ == '__main__':
-    """If this file is ran, a basic black window is shown as a test."""
-    app = App({
-        'SCR_SIZE'  : (640, 480),
-        'SCR_CAP'   : 'Pygame and Python 3 Test',
-        'SCR_FLAGS' : pygame.HWSURFACE | pygame.DOUBLEBUF
-    })
-    app.run()
