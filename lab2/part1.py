@@ -33,13 +33,13 @@ class Game(object):
         self.scr_surf.blit(self.mario_img, self.mouse_mario_pos)
 
     def build(self):
-        """Called before the game loop starts."""
+        """Called before the game loop starts and after pygame is initialized."""
         self.setup_event_handlers()
         self.load_mario_img()
         self.load_sounds()
 
         # Use key repeat
-        pygame.key.set_repeat(25, 25)
+        pygame.key.set_repeat(250, 25)
 
     def move_key_mario(self, evt):
         """Update the keyboard input vector on key down."""
@@ -64,19 +64,27 @@ class Game(object):
 
     def play_key_sounds(self, evt):
         """Play sounds for number keys 1-4."""
+        if evt.key == pygame.K_1:
+            self.safely_play_sound(0)
+        elif evt.key == pygame.K_2:
+            self.safely_play_sound(1)
+        elif evt.key == pygame.K_3:
+            self.safely_play_sound(2)
+        elif evt.key == pygame.K_4:
+            self.safely_play_sound(3)
+
+    def play_mouse_sound(self, evt):
+        """Play sounds for mouse buttons."""
+        self.safely_play_sound(evt.button)
+
+    def safely_play_sound(self, index):
+        """Wraps a call to Sound.play() in a try/except."""
         try:
-            if evt.key == pygame.K_1:
-                self.sounds[0].play()
-            elif evt.key == pygame.K_2:
-                self.sounds[1].play()
-            elif evt.key == pygame.K_3:
-                self.sounds[2].play()
-            elif evt.key == pygame.K_4:
-                self.sounds[3].play()
+            self.sounds[index].play()
         except IndexError:
-            print('Error: sound not loaded.')
+            print('Error: sound {} not loaded.'.format(index))
         except pygame.error:
-            print('Error: could not play sound.')
+            print('Error: could not play sound {}.'.format(index))
 
     def load_mario_img(self):
         """Load mario and scale him."""
@@ -100,7 +108,8 @@ class Game(object):
         """Register methods with specific Pygame events."""
         self.evt_mgr.subscribe(pygame.KEYDOWN, self.move_key_mario)
         self.evt_mgr.subscribe(pygame.KEYDOWN, self.play_key_sounds)
-
+        self.evt_mgr.subscribe(pygame.MOUSEBUTTONDOWN, self.play_mouse_sound)
+3
 
 if __name__ == '__main__':
     # Create the configuration dict.
