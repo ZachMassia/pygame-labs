@@ -30,13 +30,8 @@ class Game(object):
 
     def build(self):
         """Called before the game loop starts."""
-        # Load mario at scale him
-        self.mario_img = pygame.image.load("mario.png")
-        self.mario_img = pygame.transform.scale(self.mario_img, (64, 64))
-        # Use (0,0) as colorkey
-        self.mario_img.set_colorkey(self.mario_img.get_at((0, 0)))
-
         self.setup_event_handlers()
+        self.load_mario_img()
 
         # Use key repeat
         pygame.key.set_repeat(25, 25)
@@ -75,6 +70,14 @@ class Game(object):
         elif evt.key == pygame.K_4:
             num = 4
         #TODO Actually play the sound
+
+    def load_mario_img(self):
+        """Load mario and scale him."""
+        self.mario_img = pygame.image.load("mario.png")
+        self.mario_img = pygame.transform.scale(self.mario_img, (64, 64))
+
+        # Use (0,0) as colorkey
+        self.mario_img.set_colorkey(self.mario_img.get_at((0, 0)))
 
     def setup_event_handlers(self):
         self.evt_mgr.subscribe(pygame.KEYDOWN, self.move_key_mario)
