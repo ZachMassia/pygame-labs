@@ -1,6 +1,9 @@
 #!/usr/bin/env python
+import sys
 import pygame
+from pygame.math import Vector2
 from basic_game.app import App
+from mario import Mario
 
 
 class Game(object):
@@ -11,26 +14,32 @@ class Game(object):
 
         self.sounds = list()
         self.mario_img = None
+        self.marios = dict()
 
-        self.input_vec = pygame.math.Vector2()
-        self.key_mario_pos = pygame.math.Vector2()
-        self.mouse_mario_pos = pygame.math.Vector2()
+        self.input_vec = Vector2()
 
     def update(self, dt):
         """Update the game logic."""
-        self.key_mario_pos += self.input_vec * dt
-        self.mouse_mario_pos = pygame.mouse.get_pos()
+        self.marios['key'].set_dir(self.input_vec)
+
+        # Get the unit vector pointing to the mouse from mouse mario's
+        # current location.
+        new_dir = Vector2(pygame.mouse.get_pos()) - self.marios['mouse'].pos
+
+        dead_zone = 10   # keeps jittering effect from happening.
+        if new_dir.length() > dead_zone:
+            self.marios['mouse'].set_dir(new_dir)
+        else:
+            self.marios['mouse'].set_dir(Vector2(0, 0))
+
+        [m.update(dt) for m in self.marios.values()]
 
         # Reset input vec.
         self.input_vec = pygame.math.Vector2()
 
     def draw(self):
         """Blit surfaces to the display surface."""
-        # Keyboard Mario
-        self.scr_surf.blit(self.mario_img, (self.key_mario_pos.x,
-                                            self.key_mario_pos.y))
-        # Mouse Mario
-        self.scr_surf.blit(self.mario_img, self.mouse_mario_pos)
+        [m.draw(self.scr_surf) for m in self.marios.values()]
 
     def build(self):
         """Called before the game loop starts and after pygame is initialized."""
@@ -38,10 +47,18 @@ class Game(object):
         self.load_mario_img()
         self.load_sounds()
 
+        try:
+            self.marios['key'] = Mario(self.mario_img, Vector2(0, 0))
+            self.marios['mouse'] = Mario(self.mario_img, Vector2(self.scr_surf.get_width() - self.mario_img.get_width(), 0))
+            self.marios['joy'] = Mario(self.mario_img, Vector2(0, self.scr_surf.get_height() - self.mario_img.get_height()))
+        except ValueError:
+            print('Couldn\'t create marios')
+            sys.exit(-1)
+
         # Use key repeat
         pygame.key.set_repeat(250, 25)
 
-    def move_key_mario(self, evt):
+    def update_key_input_vec(self, evt):
         """Update the keyboard input vector on key down."""
         # X Axis
         if evt.key == pygame.K_LEFT:
@@ -58,9 +75,6 @@ class Game(object):
             self.input_vec.y = 1
         else:
             self.input_vec.y = 0
-
-        if self.input_vec.length() > 0 and not self.input_vec.is_normalized():
-            self.input_vec.normalize_ip()
 
     def play_key_sounds(self, evt):
         """Play sounds for number keys 1-4."""
@@ -96,7 +110,7 @@ class Game(object):
 
     def load_sounds(self):
         """Load all required sound effects."""
-        for i in range(0, 4):
+        for i in range(4):
             try:
                 sound = pygame.mixer.Sound(file='sound{}.ogg'.format(i))
                 self.sounds.append(sound)
@@ -106,10 +120,10 @@ class Game(object):
 
     def setup_event_handlers(self):
         """Register methods with specific Pygame events."""
-        self.evt_mgr.subscribe(pygame.KEYDOWN, self.move_key_mario)
+        self.evt_mgr.subscribe(pygame.KEYDOWN, self.update_key_input_vec)
         self.evt_mgr.subscribe(pygame.KEYDOWN, self.play_key_sounds)
         self.evt_mgr.subscribe(pygame.MOUSEBUTTONDOWN, self.play_mouse_sound)
-3
+
 
 if __name__ == '__main__':
     # Create the configuration dict.
