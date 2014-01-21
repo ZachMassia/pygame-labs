@@ -25,8 +25,14 @@ class Game(object):
 
     def build(self):
         """Called before the game loop starts and after pygame is initialized."""
+        self.setup_cars()
         self.setup_event_handlers()
 
+        # Use key repeat
+        pygame.key.set_repeat(250, 25)
+
+    def setup_cars(self):
+        """Initialize the Car sprites."""
         # Create cars using colored blocks for now.
         size = (64, 64)
         x_vel = 0.5
@@ -43,9 +49,6 @@ class Game(object):
         # Register the cars with the Sprite group.
         self.cars.add(red_car, blue_car)
 
-        # Use key repeat
-        pygame.key.set_repeat(250, 25)
-
     def setup_event_handlers(self):
         """Register methods with specific Pygame events."""
         pass
@@ -54,7 +57,7 @@ class Game(object):
 if __name__ == '__main__':
     # Create the configuration dict.
     cfg = {
-        'SCR_SIZE': (640, 480),
+        'SCR_SIZE': (1024, 480),
         'SCR_CAP': 'Pygame and Python 3 Test',
         'SCR_FLAGS': pygame.HWSURFACE | pygame.DOUBLEBUF
     }
