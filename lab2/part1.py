@@ -22,10 +22,13 @@ class Game(object):
         self.marios = list()
 
         self.input_vec = Vector2()
+        self.joystick = None
+        self.joy_vec = Vector2()
 
     def update(self, dt):
         """Update the game logic."""
         self.marios[Game.KEY].set_dir(self.input_vec)
+        self.marios[Game.JOY].set_dir(self.joy_vec)
 
         # Get the unit vector pointing to the mouse from mouse mario's
         # current location.
@@ -38,7 +41,10 @@ class Game(object):
         else:
             self.marios[Game.MOUSE].set_dir(Vector2(0, 0))
 
-        for mario in self.marios:
+        for i, mario in enumerate(self.marios):
+            hit_scr_edge = self.clamp_to_screen(mario)
+            if hit_scr_edge:
+                self.safely_play_sound(i)
             mario.update(dt)
 
         # Reset input vec.
@@ -55,9 +61,9 @@ class Game(object):
         self.load_mario_img()
         self.load_sounds()
 
-        top_left = Vector2(0, 0)
-        top_right = Vector2(self.scr_surf.get_width() - self.mario_img.get_width(), 0)
-        bottom_left = Vector2(0, self.scr_surf.get_height() - self.mario_img.get_height())
+        top_left = Vector2(5, 5)
+        top_right = Vector2(self.scr_surf.get_width() - self.mario_img.get_width() - 5, 5)
+        bottom_left = Vector2(5, self.scr_surf.get_height() - self.mario_img.get_height() - 5)
 
         try:
             self.marios.extend([
@@ -79,6 +85,12 @@ class Game(object):
         # Use key repeat
         pygame.key.set_repeat(250, 25)
 
+        # Connect joystick if available
+        pygame.joystick.init()
+        if pygame.joystick.get_count() >= 1:
+            self.joystick = pygame.joystick.Joystick(0)
+            self.joystick.init()
+
     def handle_collisions(self, mario):
         """Fire off a sound based on the mario who was hit."""
         # TODO: Timer to prevent spamming a sound
@@ -88,6 +100,29 @@ class Game(object):
             self.safely_play_sound(1)
         elif mario.name == 'joy':
             self.safely_play_sound(2)
+
+    def clamp_to_screen(self, mario):
+        """Limits the vector to the screen bounds.
+
+        Returns true when mario was outside the screen.
+
+        """
+        def clamp(x, minimum, maximum):
+            """Clamp a single value to a range."""
+            return max(minimum, min(x, maximum))
+
+        scr = Vector2(self.scr_surf.get_size())
+        new_pos = Vector2(
+            clamp(mario.pos.x, 0, scr.x),
+            clamp(mario.pos.y, 0, scr.y)
+        )
+
+        # Check if any change was made
+        if new_pos == mario.pos:
+            return False
+        else:
+            mario.pos = new_pos
+            return True
 
     def update_key_input_vec(self, evt):
         """Update the keyboard input vector on key down."""
@@ -107,6 +142,15 @@ class Game(object):
         else:
             self.input_vec.y = 0
 
+    def update_joy_input_vec(self, evt):
+        """Update the joystick input vector on axis movement."""
+        X = 0
+        Y = 1
+        if evt.axis == X:
+            self.joy_vec.x = evt.value
+        elif evt.axis == Y:
+            self.joy_vec.y = evt.value
+
     def play_key_sounds(self, evt):
         """Play sounds for number keys 1-4."""
         if evt.key == pygame.K_1:
@@ -120,6 +164,10 @@ class Game(object):
 
     def play_mouse_sound(self, evt):
         """Play sounds for mouse buttons."""
+        self.safely_play_sound(evt.button)
+
+    def play_joy_sound(self, evt):
+        """Play sounds for joystick buttons."""
         self.safely_play_sound(evt.button)
 
     def safely_play_sound(self, index):
@@ -151,9 +199,13 @@ class Game(object):
 
     def setup_event_handlers(self):
         """Register methods with specific Pygame events."""
-        self.evt_mgr.subscribe(pygame.KEYDOWN, self.update_key_input_vec)
-        self.evt_mgr.subscribe(pygame.KEYDOWN, self.play_key_sounds)
-        self.evt_mgr.subscribe(pygame.MOUSEBUTTONDOWN, self.play_mouse_sound)
+        self.evt_mgr.subscribe_list([
+            (pygame.KEYDOWN, self.update_key_input_vec),
+            (pygame.KEYDOWN, self.play_key_sounds),
+            (pygame.MOUSEBUTTONDOWN, self.play_mouse_sound),
+            (pygame.JOYBUTTONDOWN, self.play_joy_sound),
+            (pygame.JOYAXISMOTION, self.update_joy_input_vec)
+        ])
 
 
 if __name__ == '__main__':

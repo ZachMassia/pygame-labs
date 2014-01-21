@@ -18,6 +18,11 @@ class EventManager(object):
         else:
             self.subs[evt_type] = [func]
 
+    def subscribe_list(self, pairs):
+        """Subscribe a list of function to event tuples."""
+        for evt_type, func in pairs:
+            self.subscribe(evt_type, func)
+
     def unsubscribe(self, func):
         """Attempt to unsubscribe a function. No errors if not found."""
         for subList in self.subs:
