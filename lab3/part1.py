@@ -3,24 +3,7 @@ import sys
 import pygame
 from pygame.math import Vector2
 from basic_game.app import App
-from car import Car
-
-
-class FinishLine(pygame.sprite.Sprite):
-    """Basic white line sprite."""
-
-    def __init__(self, screen_surf, width, percent_towards_right):
-        # Parent class constructor must be called.
-        super(FinishLine, self).__init__()
-
-        scr_size = screen_surf.get_size()
-
-        # Create a surface and fill it white.
-        self.image = pygame.Surface((scr_size[0] * width, scr_size[1]))
-        self.image.fill((255, 255, 255))
-
-        self.rect = self.image.get_rect()
-        self.rect.x = scr_size[0] * percent_towards_right
+from sprites import Car, FinishLine
 
 
 class Game(object):
