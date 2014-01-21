@@ -19,8 +19,7 @@ class Game(object):
 
     def draw(self):
         """Blit surfaces to the display surface."""
-        for m in self.marios:
-            m.draw(self.scr_surf)
+        pass
 
     def build(self):
         """Called before the game loop starts and after pygame is initialized."""
