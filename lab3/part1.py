@@ -7,11 +7,6 @@ from basic_game.app import App
 
 class Game(object):
 
-    # Class constants:
-    KEY = 0
-    MOUSE = 1
-    JOY = 2
-
     def __init__(self):
         self.evt_mgr = None   # Injected by App
         self.scr_surf = None  # Injected by App
