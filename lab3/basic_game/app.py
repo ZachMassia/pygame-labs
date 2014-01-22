@@ -14,20 +14,16 @@ class App(object):
         pygame.display.set_mode(cfg['SCR_SIZE'], cfg['SCR_FLAGS'])
         pygame.display.set_caption(cfg['SCR_CAP'])
 
-        # Setup Event Manager
-        self.evt_mgr = EventManager()
+        self.evt_mgr = self.init_event_mgr()
         self.register_events()
-        self.game.evt_mgr = self.evt_mgr
+
+        if cfg['LOGGING'] == 'True':
+            self.init_logger(cfg)
 
         self.clock = pygame.time.Clock()
 
         self.game.scr_surf = pygame.display.get_surface()
         self.game.build()
-
-    def register_events(self):
-        """Register a few base event handlers."""
-        self.evt_mgr.subscribe(pygame.QUIT, self.shutdown)
-        self.evt_mgr.subscribe(pygame.KEYDOWN, self.on_keydown)
 
     def run(self):
         """Kicks off the game loop."""
@@ -47,11 +43,30 @@ class App(object):
         pygame.quit()
         sys.exit()
 
-    def shutdown(self, evt):
-        """Performs any cleanup operations and stop the game loop."""
-        self.running = False
-
     def on_keydown(self, evt):
         """Handle basic keydown events."""
         if evt.key == pygame.K_ESCAPE:
             self.shutdown(evt)
+
+    def init_event_mgr(self):
+        """Return the event manager and inject it into the game object."""
+        evt_mgr = EventManager()
+        self.game.evt_mgr = evt_mgr
+        return evt_mgr
+
+    def init_logger(self, cfg):
+        """Return the logger and inject it into the game object."""
+        import logging
+        logging.basicConfig(filename=cfg['LOG_FILE'],
+                            level=cfg['LOG_LEVEL'],
+                            format='%(levelname)s:\t%(message)s')
+        self.game.logging_enabled = True
+
+    def register_events(self):
+        """Register a few base event handlers."""
+        self.evt_mgr.subscribe(pygame.QUIT, self.shutdown)
+        self.evt_mgr.subscribe(pygame.KEYDOWN, self.on_keydown)
+
+    def shutdown(self, evt):
+        """Performs any cleanup operations and stop the game loop."""
+        self.running = False

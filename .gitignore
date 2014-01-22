@@ -51,3 +51,6 @@ docs/_build/
 
 # Pycharm stuff
 .idea/
+
+# Log files
+log.txt
