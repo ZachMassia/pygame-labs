@@ -12,6 +12,7 @@ class Car(pygame.sprite.Sprite):
         self.image = img_surf
         self.rect = self.image.get_rect()
         self.vel = pygame.math.Vector2(0, 0)
+        self.score = 0
 
     def update(self, dt):
         """TODO: Write docstring."""

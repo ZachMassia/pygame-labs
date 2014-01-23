@@ -19,6 +19,8 @@ class App(object):
 
         if cfg['LOGGING'] == 'True':
             self.init_logger(cfg)
+            self.evt_mgr.logging_enabled = True
+            self.game.logging_enabled = True
 
         self.clock = pygame.time.Clock()
 
@@ -60,7 +62,6 @@ class App(object):
         logging.basicConfig(filename=cfg['LOG_FILE'],
                             level=cfg['LOG_LEVEL'],
                             format='%(levelname)s:\t%(message)s')
-        self.game.logging_enabled = True
 
     def register_events(self):
         """Register a few base event handlers."""
@@ -70,3 +71,7 @@ class App(object):
     def shutdown(self, evt):
         """Performs any cleanup operations and stop the game loop."""
         self.running = False
+
+        if self.game.logging_enabled:
+            import logging
+            logging.info('{}\n'.format('-' * 75))
