@@ -21,6 +21,7 @@ class Game(object):
         self.finish_line = None
         self.background = None
         self.racing = False
+        self.font = None
 
     def update(self, dt):
         """Update the game logic."""
@@ -46,6 +47,10 @@ class Game(object):
         self.background = pygame.image.load('street.png')
         self.background = pygame.transform.scale(self.background,
                                                  self.scr_surf.get_size())
+
+        # Load the default pygame font.
+        font_height = self.sprites[0].rect.height * (2/3)
+        self.font = pygame.font.Font(None, font_height)
 
         # Set the delay before a key starts repeating, and the repeat rate.
         pygame.key.set_repeat(250, 25)
