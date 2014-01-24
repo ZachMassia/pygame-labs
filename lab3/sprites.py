@@ -15,7 +15,7 @@ class Car(pygame.sprite.Sprite):
         self.score = 0
 
     def update(self, dt):
-        """TODO: Write docstring."""
+        """Update the cars position."""
         # Update position.
         self.rect.x += self.vel.x * dt
         self.rect.y += self.vel.y * dt

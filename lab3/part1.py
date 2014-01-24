@@ -77,6 +77,7 @@ class Game(object):
             log_msg = 'Race was a tie.'
             for car in self.sprites:
                 car.score += 1
+                self.move_car_to_finish_area(car)
         elif n == 1:
             winner = collisions[0]
             log_msg = '{} won the race.'.format(winner)
