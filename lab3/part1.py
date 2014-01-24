@@ -49,7 +49,7 @@ class Game(object):
                                                  self.scr_surf.get_size())
 
         # Load the default pygame font.
-        font_height = self.sprites[0].rect.height * (2/3)
+        font_height = int(self.sprites.sprites()[0].rect.height * (2/3))
         self.font = pygame.font.Font(None, font_height)
 
         # Set the delay before a key starts repeating, and the repeat rate.
@@ -103,6 +103,8 @@ class Game(object):
         """Start a new race."""
         if self.logging_enabled:
             logging.info('Starting a new race')
+
+        self.reset_cars()
         self.racing = True
 
     def reset_cars(self):
