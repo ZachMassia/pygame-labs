@@ -14,9 +14,12 @@ class Car(pygame.sprite.Sprite):
         self.vel = pygame.math.Vector2(0, 0)
         self.score = 0
 
+        # Create a copy of the image to use as an original.
+        self.original_image = pygame.Surface(self.image.get_size())
+        self.image.blit()
+
     def update(self, dt):
         """Update the cars position."""
-        # Update position.
         self.rect.x += self.vel.x * dt
         self.rect.y += self.vel.y * dt
 
