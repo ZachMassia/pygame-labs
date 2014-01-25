@@ -57,7 +57,7 @@ class App(object):
         return evt_mgr
 
     def init_logger(self, cfg):
-        """Return the logger and inject it into the game object."""
+        """Configure the logging module."""
         import logging
         logging.basicConfig(filename=cfg['LOG_FILE'],
                             level=cfg['LOG_LEVEL'],
