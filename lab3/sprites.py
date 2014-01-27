@@ -14,6 +14,12 @@ class Car(pygame.sprite.Sprite):
         self.vel = pygame.math.Vector2(0, 0)
 
         self.score = 0
+        self.on_score_change = lambda x: None
+
+    def adj_score(self, val):
+        """Update the score and call the event handler."""
+        self.score += val
+        self.on_score_change()
 
     def update(self, dt):
         """Update the cars position."""

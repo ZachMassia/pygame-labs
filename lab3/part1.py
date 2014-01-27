@@ -3,8 +3,10 @@ import sys
 import random
 import pygame
 from pygame.math import Vector2
+
 from basic_game.app import App
 from sprites import Car, FinishLine
+from hud import HUD
 
 
 class Game(object):
@@ -21,7 +23,8 @@ class Game(object):
         self.finish_line = None
         self.background = None
         self.racing = False
-        self.font = None
+
+        self.hud = None
 
     def update(self, dt):
         """Update the game logic."""
@@ -36,21 +39,19 @@ class Game(object):
         self.scr_surf.blit(self.background, (0, 0))
         self.scr_surf.blit(self.finish_line.image, self.finish_line.rect)
         self.sprites.draw(self.scr_surf)
+        self.hud.draw(self.scr_surf)
 
     def build(self):
-        """Called before the game loop starts and after pygame is initialized."""
+        """Called before the game loop starts."""
         self.setup_cars()
         self.setup_finish_line()
         self.setup_event_handlers()
+        self.setup_hud()
 
         # Load the background and scale to screen size.
         self.background = pygame.image.load('street.png')
         self.background = pygame.transform.scale(self.background,
                                                  self.scr_surf.get_size())
-
-        # Load the default pygame font.
-        font_height = int(self.sprites.sprites()[0].rect.height * (2/3))
-        self.font = pygame.font.Font(None, font_height)
 
         # Set the delay before a key starts repeating, and the repeat rate.
         pygame.key.set_repeat(250, 25)
@@ -81,12 +82,12 @@ class Game(object):
         if n >= 2:
             log_msg = 'Race was a tie.'
             for car in self.sprites:
-                car.score += 1
+                car.adj_score(1)
                 self.move_car_to_finish_area(car)
         elif n == 1:
             winner = collisions[0]
             log_msg = '{} won the race.'.format(winner)
-            winner.score += 1
+            winner.adj_score(1)
             self.move_car_to_finish_area(winner)
 
         if log_msg:
@@ -153,6 +154,18 @@ class Game(object):
     def setup_finish_line(self):
         """Create the finish line surface."""
         self.finish_line = FinishLine('finish', self.scr_surf, 0.03, 0.8)
+
+    def setup_hud(self):
+        """Create the HUD object"""
+        scr_x, scr_y = self.scr_surf.get_size()
+
+        # Scale font based on screen size.
+        font_height = 0.075
+        max_width = 0.2
+
+        # Create the HUD and register cars.
+        self.hud = HUD((scr_y * font_height), (scr_x * max_width))
+        self.hud.register_cars(self.sprites.sprites())
 
     def setup_event_handlers(self):
         """Register methods with specific Pygame events."""
