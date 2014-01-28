@@ -39,7 +39,7 @@ class Game(object):
         self.scr_surf.blit(self.background, (0, 0))
         self.scr_surf.blit(self.finish_line.image, self.finish_line.rect)
         self.sprites.draw(self.scr_surf)
-        self.hud.draw(self.scr_surf)
+        self.hud.draw()
 
     def build(self):
         """Called before the game loop starts."""
@@ -90,13 +90,15 @@ class Game(object):
             winner.adj_score(1)
             self.move_car_to_finish_area(winner)
 
-        if log_msg:
+        if log_msg:  # At least one car hit the finish line.
             self.racing = False
 
+            # Stop both cars.
             for car in self.sprites:
                 car.vel.x = 0
 
-            print(log_msg)
+            self.hud.flash(log_msg, 2250)
+
             if self.logging_enabled:
                 logging.info(log_msg)
 
@@ -164,7 +166,12 @@ class Game(object):
         max_width = 0.2
 
         # Create the HUD and register cars.
-        self.hud = HUD((scr_y * font_height), (scr_x * max_width))
+        self.hud = HUD(
+            target=self.scr_surf,
+            font_size=(scr_y * font_height),
+            width=(scr_x * max_width),
+            flash_size=(scr_x, (scr_y * font_height * 2))
+        )
         self.hud.register_cars(self.sprites.sprites())
 
     def setup_event_handlers(self):
