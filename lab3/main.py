@@ -18,7 +18,7 @@ class Game(object):
         self.scr_surf = None
         self.logging_enabled = False
 
-        self.sounds = list()
+        self.sounds = dict()
         self.sprites = pygame.sprite.Group()
         self.finish_line = None
         self.background = None
@@ -56,6 +56,15 @@ class Game(object):
         # Set the delay before a key starts repeating, and the repeat rate.
         pygame.key.set_repeat(250, 25)
 
+        self.hud.flash("Press G to start, R to reset", 2500)
+
+        try:
+            self.sounds['race_start'] = pygame.mixer.Sound(file='gunshot.ogg')
+            self.sounds['race_end'] = pygame.mixer.Sound(file='winner.ogg')
+        except pygame.error:
+            print('Error loading sounds: {}'.format(pygame.get_error()))
+            exit(1)
+
         if self.logging_enabled:
             import logging
             logging.info('Game done building.')
@@ -92,6 +101,7 @@ class Game(object):
 
         if log_msg:  # At least one car hit the finish line.
             self.racing = False
+            self.play_sound('race_end')
 
             # Stop both cars.
             for car in self.sprites:
@@ -109,6 +119,7 @@ class Game(object):
 
         self.reset_cars()
         self.racing = True
+        self.play_sound('race_start')
 
     def reset_cars(self):
         """Reset all cars to the left side and set velocity to 0."""
@@ -178,6 +189,14 @@ class Game(object):
         """Register methods with specific Pygame events."""
         self.evt_mgr.subscribe(pygame.KEYDOWN, self.on_keydown)
 
+    def play_sound(self, name):
+        "Plays a sound and catches any exceptions."
+        try:
+            self.sounds[name].play()
+        except IndexError:
+            print('Error: sound {} not loaded.'.format(name))
+        except pygame.error:
+            print('Error: could not play sound {}.'.format(name))
 
 if __name__ == '__main__':
     import logging
