@@ -1,0 +1,17 @@
+* Lua Scripting Lab 8
+
+** Requirements
+*** Text frame with:
+**** TODO Text box which displays file loaded from menu
+**** 2 buttons placed horizontally
+***** TODO Button to change text colour
+***** TODO Button to change bg colour of text
+- Both buttons use system colour dialog
+
+*** TODO Main menu
+**** TODO Load text file
+- Opens file dialog box to select file
+- Display the loaded text file in the text box using callback
+**** TODO Exit using callback
+
+
